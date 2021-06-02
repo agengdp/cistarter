@@ -9,8 +9,65 @@ class Auth extends MY_Controller{
 		parent::__construct();
 	}
 
+	/**
+	 * Authorization
+	 *
+	 * @return void
+	 */
 	public function index(){
-		
+		if(!$this->input->post()){
+			if (auth(true)){
+				return redirect('/');
+			}
+			echo 'You are not allowed to perform GET request';
+			die();
+		}
+
+		$this->form_validation->set_rules('username', 'Username', 'trim|required');
+		$this->form_validation->set_rules('password', 'Password', 'trim|required');
+
+		if($this->form_validation->run() === false){
+			$message = [
+				'status'		=> 'error',
+				'message'		=> 'Cannot validate username & password',
+				'data'			=> validation_errors()
+			];
+			$this->session->set_flashdata('error', $data);
+			return redirect($_SERVER['HTTP_REFERER'] . '/?username=' . $this->input->post('username'));
+		}
+
+		$this->load->model('user_model');
+		$user = $this->user_model->findByUsername($username);
+
+		if (empty($user)){
+			$message = [
+				'status'		=> 'error',
+				'message'		=> 'User tidak ditemukan',
+				'data'			=> validation_errors()
+			];
+			$this->session->set_flashdata('error', $data);
+			return redirect($_SERVER['HTTP_REFERER'] . '/?username=' . $this->input->post('username'));
+		}
+
+		if(password_verify($this->input->post('password'), $user['password'])){
+			$message = [
+				'status'		=> 'error',
+				'message'		=> 'Password tidak sesuai',
+				'data'			=> validation_errors()
+			];
+			$this->session->set_flashdata('error', $data);
+			return redirect($_SERVER['HTTP_REFERER'] . '/?username=' . $this->input->post('username'));
+		}
+
+		$data = [
+			'login'		=> true,
+			'user'		=> $user,
+			'time'		=> time()
+		];
+
+		$this->session->set_userdata($data);
+		return redirect('/');
+
 	}
 
 	/**
