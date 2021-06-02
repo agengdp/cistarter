@@ -23,6 +23,7 @@ class Auth extends MY_Controller{
 			die();
 		}
 
+
 		$this->form_validation->set_rules('username', 'Username', 'trim|required');
 		$this->form_validation->set_rules('password', 'Password', 'trim|required');
 
@@ -32,12 +33,12 @@ class Auth extends MY_Controller{
 				'message'		=> 'Cannot validate username & password',
 				'data'			=> validation_errors()
 			];
-			$this->session->set_flashdata('error', $data);
-			return redirect($_SERVER['HTTP_REFERER'] . '/?username=' . $this->input->post('username'));
+			$this->session->set_flashdata('error', $message);
+			return redirect(base_url('auth/login/?username=' . $this->input->post('username')));
 		}
 
 		$this->load->model('user_model');
-		$user = $this->user_model->findByUsername($username);
+		$user = $this->user_model->findByUsername($this->input->post('username'));
 
 		if (empty($user)){
 			$message = [
@@ -45,18 +46,19 @@ class Auth extends MY_Controller{
 				'message'		=> 'User tidak ditemukan',
 				'data'			=> validation_errors()
 			];
-			$this->session->set_flashdata('error', $data);
-			return redirect($_SERVER['HTTP_REFERER'] . '/?username=' . $this->input->post('username'));
+			$this->session->set_flashdata('error', $message);
+
+			return redirect(base_url('auth/login/?username=' . $this->input->post('username')));
 		}
 
-		if(password_verify($this->input->post('password'), $user['password'])){
+		if(!password_verify($this->input->post('password'), $user['password'])){
 			$message = [
 				'status'		=> 'error',
 				'message'		=> 'Password tidak sesuai',
 				'data'			=> validation_errors()
 			];
-			$this->session->set_flashdata('error', $data);
-			return redirect($_SERVER['HTTP_REFERER'] . '/?username=' . $this->input->post('username'));
+			$this->session->set_flashdata('error', $message);
+			return redirect(base_url('auth/login/?username=' . $this->input->post('username')));
 		}
 
 		$data = [

@@ -65,7 +65,7 @@ class Migration_seed_default_user extends CI_Migration {
 		 * Sync role user
 		 */
 		$this->db->insert($this->user_has_role_table, [
-			'user_id' 	=> $root_id,
+			'user_id' 	=> $admin_id,
 			'role_id' 	=> $admin_role->id,
 			'status'	=> 1
 		]);

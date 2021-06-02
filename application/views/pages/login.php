@@ -6,7 +6,12 @@
                     Login
                 </div>
             </div>
-        </div>
+        </div>		
+		<?php if($this->session->flashdata('error') !== null) : ?>
+			<div class="border border-red-600 bg-red-100 text-red-600 p-3 rounded mb-2">
+				<?= $this->session->flashdata('error')['message']; ?>
+			</div>
+        <?php endif; ?>
         <div class="p-6 md:shadow-lg rounded-lg md:bg-white">
             <?= form_open('auth'); ?>
 				<div class="mb-4">
